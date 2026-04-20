@@ -1,28 +1,36 @@
 namespace SpriteKind {
     export const Other = SpriteKind.create()
 }
+controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
+    // your sprite's current rotation
+    angleRad = playerPlane.rotation
+    speed = 100
+    vx = Math.cos(angleRad) * speed
+    vy = Math.sin(angleRad) * speed
+    projectile = sprites.createProjectileFromSprite(assets.image`Bullet`, playerPlane, vx, vy)
+})
 controller.left.onEvent(ControllerButtonEvent.Pressed, function () {
     playerPlane.rotation += -0.5
 })
 function game1 () {
     scene.setBackgroundImage(assets.image`game1Scene`)
     playerPlane = sprites.create(img`
-        ....ffffff.........ccc..
-        ....ff22ccf.......cc4f..
-        .....ffccccfff...cc44f..
-        ....cc24442222cccc442f..
-        ...c9b4422222222cc422f..
-        ..c999b2222222222222fc..
-        .c2b99111b222222222c22c.
-        c222b111992222ccccccc22f
-        f222222222222c222ccfffff
-        .f2222222222442222f.....
-        ..ff2222222cf442222f....
-        ....ffffffffff442222c...
-        .........f2cfffc2222c...
-        .........fcc2ffffffff...
-        ..........fc2ffff.......
-        ...........fffff........
+        ..ccc.........ffffff....
+        ..f4cc.......fcc22ff....
+        ..f44cc...fffccccff.....
+        ..f244cccc22224442cc....
+        ..f224cc2222222244b9c...
+        ..cf2222222222222b999c..
+        .c22c222222222b11199b2c.
+        f22ccccccc222299111b222c
+        fffffcc222c222222222222f
+        .....f2222442222222222f.
+        ....f222244fc2222222ff..
+        ...c222244ffffffffff....
+        ...c2222cfffc2f.........
+        ...ffffffff2ccf.........
+        .......ffff2cf..........
+        ........fffff...........
         `, SpriteKind.Player)
     playerPlane.setScale(1, ScaleAnchor.Middle)
 }
@@ -162,5 +170,10 @@ function titleScreen () {
     )
 }
 let titleScreenPlane: Sprite = null
+let projectile: Sprite = null
+let vy = 0
+let vx = 0
+let speed = 0
 let playerPlane: Sprite = null
+let angleRad = 0
 game1()
