@@ -1,6 +1,9 @@
 namespace SpriteKind {
     export const Other = SpriteKind.create()
 }
+controller.left.onEvent(ControllerButtonEvent.Pressed, function () {
+    playerPlane.rotation += -0.5
+})
 function game1 () {
     scene.setBackgroundImage(assets.image`game1Scene`)
     playerPlane = sprites.create(img`
@@ -21,8 +24,11 @@ function game1 () {
         ..........fc2ffff.......
         ...........fffff........
         `, SpriteKind.Player)
-    playerPlane.setScale(0.8, ScaleAnchor.Middle)
+    playerPlane.setScale(1, ScaleAnchor.Middle)
 }
+controller.right.onEvent(ControllerButtonEvent.Pressed, function () {
+    playerPlane.rotation += 0.5
+})
 function titleScreen () {
     scene.setBackgroundImage(assets.image`TitleScreen`)
     titleScreenPlane = sprites.create(img`
