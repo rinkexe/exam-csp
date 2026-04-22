@@ -1,17 +1,6 @@
 namespace SpriteKind {
     export const Other = SpriteKind.create()
 }
-controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
-    // your sprite's current rotation
-    angleRad = playerPlane.rotation
-    speed = 100
-    vx = Math.cos(angleRad) * speed
-    vy = Math.sin(angleRad) * speed
-    projectile = sprites.createProjectileFromSprite(assets.image`Bullet`, playerPlane, vx, vy)
-})
-controller.left.onEvent(ControllerButtonEvent.Pressed, function () {
-    playerPlane.rotation += -0.5
-})
 function game1 () {
     scene.setBackgroundImage(assets.image`game1Scene`)
     playerPlane = sprites.create(img`
@@ -34,9 +23,6 @@ function game1 () {
         `, SpriteKind.Player)
     playerPlane.setScale(1, ScaleAnchor.Middle)
 }
-controller.right.onEvent(ControllerButtonEvent.Pressed, function () {
-    playerPlane.rotation += 0.5
-})
 function titleScreen () {
     scene.setBackgroundImage(assets.image`TitleScreen`)
     titleScreenPlane = sprites.create(img`
@@ -169,11 +155,77 @@ function titleScreen () {
     true
     )
 }
-let titleScreenPlane: Sprite = null
+function alienSpawn (mySprite: Sprite) {
+    if (randint(0, 1) == 1) {
+        xAlienSpawn = randint(0, 160)
+        if (randint(0, 1) == 1) {
+            yAlienSpawn = 120
+        } else {
+            yAlienSpawn = 0
+        }
+    } else {
+        yAlienSpawn = randint(0, 120)
+        if (randint(0, 1) == 1) {
+            xAlienSpawn = 160
+        } else {
+            xAlienSpawn = 0
+        }
+    }
+    mySprite.setPosition(xAlienSpawn, yAlienSpawn)
+    mySprite.follow(playerPlane, 30)
+    mySprite.rotationDegrees = Math.atan2(yAlienSpawn, xAlienSpawn)
+}
 let projectile: Sprite = null
 let vy = 0
 let vx = 0
-let speed = 0
-let playerPlane: Sprite = null
 let angleRad = 0
+let yAlienSpawn = 0
+let xAlienSpawn = 0
+let titleScreenPlane: Sprite = null
+let playerPlane: Sprite = null
 game1()
+game.onUpdateInterval(10, function () {
+    if (controller.right.isPressed()) {
+        playerPlane.rotationDegrees += 2
+    }
+    if (controller.left.isPressed()) {
+        playerPlane.rotationDegrees += -2
+    }
+})
+game.onUpdateInterval(500, function () {
+    alienSpawn(sprites.create(img`
+        .......fc.......
+        ......f88c......
+        .....f8888c.....
+        .....f888b9c....
+        ....f888b999c.ff
+        ....f888199bcfff
+        ....f88811b48f8f
+        ....f88811844c8f
+        ....f88891884ccf
+        ..fff8889b884ccf
+        .fc8f88888888cf.
+        fcccfc8888888f..
+        f88fff4888888f..
+        fffff44c88888f..
+        ffff4488c888c...
+        fffc4888c888c...
+        .ff88888c88cc...
+        ..f8888cc88ccc..
+        ..f888fcc8844cc.
+        ..f88f.fcc8844cc
+        ..fcc..fc8f8844c
+        .......f88cffffc
+        .......f8c......
+        .......ff.......
+        `, SpriteKind.Enemy))
+})
+game.onUpdateInterval(300, function () {
+    if (controller.up.isPressed()) {
+        // your sprite's current rotation
+        angleRad = playerPlane.rotation
+        vx = Math.cos(angleRad) * 100
+        vy = Math.sin(angleRad) * 100
+        projectile = sprites.createProjectileFromSprite(assets.image`Bullet`, playerPlane, vx, vy)
+    }
+})
