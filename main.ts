@@ -2,6 +2,7 @@ namespace SpriteKind {
     export const Other = SpriteKind.create()
 }
 controller.up.onEvent(ControllerButtonEvent.Pressed, function () {
+    music.play(music.createSoundEffect(WaveShape.Triangle, 5000, 4194, 255, 255, 100, SoundExpressionEffect.Vibrato, InterpolationCurve.Linear), music.PlaybackMode.UntilDone)
     // your sprite's current rotation
     angleRad = playerPlane.rotation
     vx = Math.cos(angleRad) * 100
@@ -11,8 +12,14 @@ controller.up.onEvent(ControllerButtonEvent.Pressed, function () {
 sprites.onOverlap(SpriteKind.Enemy, SpriteKind.Projectile, function (sprite, otherSprite) {
     sprites.destroy(sprite, effects.fire, 500)
     sprites.destroy(otherSprite, effects.fire, 500)
+    info.changeCountdownBy(additionTimesList.removeAt(0))
+    additionTimesList.push(1)
+    destroyedAliens += 1
+    music.play(music.createSoundEffect(WaveShape.Noise, 902, 663, 255, 255, 300, SoundExpressionEffect.Vibrato, InterpolationCurve.Linear), music.PlaybackMode.UntilDone)
 })
 function game1 () {
+    destroyedAliens = 0
+    crashes = 0
     scene.setBackgroundImage(assets.image`game1Scene`)
     playerPlane = sprites.create(img`
         ..ccc.........ffffff....
@@ -50,6 +57,9 @@ function game1 () {
     1
     ]
 }
+info.onCountdownEnd(function () {
+	
+})
 function titleScreen () {
     scene.setBackgroundImage(assets.image`TitleScreen`)
     titleScreenPlane = sprites.create(img`
@@ -243,12 +253,18 @@ function alienSpawn (mySprite: Sprite) {
 }
 sprites.onOverlap(SpriteKind.Player, SpriteKind.Enemy, function (sprite, otherSprite) {
     sprites.destroy(otherSprite, effects.fire, 500)
+    info.changeCountdownBy(-1 * minusTimesList.removeAt(0))
+    minusTimesList.push(5)
+    crashes += 1
+    music.play(music.createSoundEffect(WaveShape.Noise, 902, 663, 255, 255, 2000, SoundExpressionEffect.Vibrato, InterpolationCurve.Linear), music.PlaybackMode.UntilDone)
 })
 let yAlienSpawn = 0
 let xAlienSpawn = 0
 let titleScreenPlane: Sprite = null
-let additionTimesList: number[] = []
 let minusTimesList: number[] = []
+let crashes = 0
+let destroyedAliens = 0
+let additionTimesList: number[] = []
 let projectile: Sprite = null
 let vy = 0
 let vx = 0
