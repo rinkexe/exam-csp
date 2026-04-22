@@ -58,7 +58,9 @@ function game1 () {
     ]
 }
 info.onCountdownEnd(function () {
-	
+    sprites.destroyAllSpritesOfKind(SpriteKind.Enemy)
+    sprites.destroyAllSpritesOfKind(SpriteKind.Projectile)
+    sprites.destroyAllSpritesOfKind(SpriteKind.Player)
 })
 function titleScreen () {
     scene.setBackgroundImage(assets.image`TitleScreen`)
@@ -271,6 +273,7 @@ let vx = 0
 let playerPlane: Sprite = null
 let angleRad = 0
 game1()
+let Active = true
 game.onUpdateInterval(1000, function () {
     alienSpawn(sprites.create(img`
         ..ccc.........ffffff....
