@@ -1,6 +1,17 @@
 namespace SpriteKind {
     export const Other = SpriteKind.create()
 }
+controller.up.onEvent(ControllerButtonEvent.Pressed, function () {
+    // your sprite's current rotation
+    angleRad = playerPlane.rotation
+    vx = Math.cos(angleRad) * 100
+    vy = Math.sin(angleRad) * 100
+    projectile = sprites.createProjectileFromSprite(assets.image`Bullet`, playerPlane, vx, vy)
+})
+sprites.onOverlap(SpriteKind.Enemy, SpriteKind.Projectile, function (sprite, otherSprite) {
+    sprites.destroy(sprite, effects.fire, 500)
+    sprites.destroy(otherSprite, effects.fire, 500)
+})
 function game1 () {
     scene.setBackgroundImage(assets.image`game1Scene`)
     playerPlane = sprites.create(img`
@@ -22,6 +33,22 @@ function game1 () {
         ........fffff...........
         `, SpriteKind.Player)
     playerPlane.setScale(1, ScaleAnchor.Middle)
+    info.startCountdown(30)
+    minusTimesList = [
+    0.2,
+    0.5,
+    1,
+    2,
+    4,
+    5
+    ]
+    additionTimesList = [
+    0.1,
+    0.2,
+    0.5,
+    0.8,
+    1
+    ]
 }
 function titleScreen () {
     scene.setBackgroundImage(assets.image`TitleScreen`)
@@ -158,6 +185,26 @@ function titleScreen () {
 function alienSpawn (mySprite: Sprite) {
     if (randint(0, 1) == 1) {
         xAlienSpawn = randint(0, 160)
+        if (xAlienSpawn >= 80) {
+            mySprite.setImage(img`
+                ........fffff...........
+                .......ffff8cf..........
+                ...ffffffff8ccf.........
+                ...c8888cfffc8f.........
+                ...c888844ffffffffff....
+                ....f888844fc8888888ff..
+                .....f8888448888888888f.
+                fffffcc888c888888888888f
+                f88ccccccc888899111b888c
+                .c88c888888888b11199b8c.
+                ..cf8888888888888b999c..
+                ..f884cc8888888844b9c...
+                ..f844cccc88884448cc....
+                ..f44cc...fffccccff.....
+                ..f4cc.......fcc88ff....
+                ..ccc.........ffffff....
+                `)
+        }
         if (randint(0, 1) == 1) {
             yAlienSpawn = 120
         } else {
@@ -167,65 +214,72 @@ function alienSpawn (mySprite: Sprite) {
         yAlienSpawn = randint(0, 120)
         if (randint(0, 1) == 1) {
             xAlienSpawn = 160
+            mySprite.setImage(img`
+                ........fffff...........
+                .......ffff8cf..........
+                ...ffffffff8ccf.........
+                ...c8888cfffc8f.........
+                ...c888844ffffffffff....
+                ....f888844fc8888888ff..
+                .....f8888448888888888f.
+                fffffcc888c888888888888f
+                f88ccccccc888899111b888c
+                .c88c888888888b11199b8c.
+                ..cf8888888888888b999c..
+                ..f884cc8888888844b9c...
+                ..f844cccc88884448cc....
+                ..f44cc...fffccccff.....
+                ..f4cc.......fcc88ff....
+                ..ccc.........ffffff....
+                `)
         } else {
             xAlienSpawn = 0
         }
     }
     mySprite.setPosition(xAlienSpawn, yAlienSpawn)
-    mySprite.follow(playerPlane, 30)
-    mySprite.rotationDegrees = Math.atan2(yAlienSpawn, xAlienSpawn)
+    mySprite.setScale(randint(8, 10) / 10, ScaleAnchor.Middle)
+    mySprite.follow(playerPlane, 40 - mySprite.scale * 30)
+    mySprite.rotation = Math.atan2(playerPlane.y - yAlienSpawn, playerPlane.x - xAlienSpawn)
 }
-let projectile: Sprite = null
-let vy = 0
-let vx = 0
-let angleRad = 0
+sprites.onOverlap(SpriteKind.Player, SpriteKind.Enemy, function (sprite, otherSprite) {
+    sprites.destroy(otherSprite, effects.fire, 500)
+})
 let yAlienSpawn = 0
 let xAlienSpawn = 0
 let titleScreenPlane: Sprite = null
+let additionTimesList: number[] = []
+let minusTimesList: number[] = []
+let projectile: Sprite = null
+let vy = 0
+let vx = 0
 let playerPlane: Sprite = null
+let angleRad = 0
 game1()
-game.onUpdateInterval(10, function () {
-    if (controller.right.isPressed()) {
-        playerPlane.rotationDegrees += 2
-    }
-    if (controller.left.isPressed()) {
-        playerPlane.rotationDegrees += -2
-    }
-})
-game.onUpdateInterval(500, function () {
+game.onUpdateInterval(1000, function () {
     alienSpawn(sprites.create(img`
-        .......fc.......
-        ......f88c......
-        .....f8888c.....
-        .....f888b9c....
-        ....f888b999c.ff
-        ....f888199bcfff
-        ....f88811b48f8f
-        ....f88811844c8f
-        ....f88891884ccf
-        ..fff8889b884ccf
-        .fc8f88888888cf.
-        fcccfc8888888f..
-        f88fff4888888f..
-        fffff44c88888f..
-        ffff4488c888c...
-        fffc4888c888c...
-        .ff88888c88cc...
-        ..f8888cc88ccc..
-        ..f888fcc8844cc.
-        ..f88f.fcc8844cc
-        ..fcc..fc8f8844c
-        .......f88cffffc
-        .......f8c......
-        .......ff.......
+        ..ccc.........ffffff....
+        ..f4cc.......fcc88ff....
+        ..f44cc...fffccccff.....
+        ..f844cccc88884448cc....
+        ..f884cc8888888844b9c...
+        ..cf8888888888888b999c..
+        .c88c888888888b11199b8c.
+        f88ccccccc888899111b888c
+        fffffcc888c888888888888f
+        .....f8888448888888888f.
+        ....f888844fc8888888ff..
+        ...c888844ffffffffff....
+        ...c8888cfffc8f.........
+        ...ffffffff8ccf.........
+        .......ffff8cf..........
+        ........fffff...........
         `, SpriteKind.Enemy))
 })
-game.onUpdateInterval(300, function () {
-    if (controller.up.isPressed()) {
-        // your sprite's current rotation
-        angleRad = playerPlane.rotation
-        vx = Math.cos(angleRad) * 100
-        vy = Math.sin(angleRad) * 100
-        projectile = sprites.createProjectileFromSprite(assets.image`Bullet`, playerPlane, vx, vy)
+game.onUpdateInterval(10, function () {
+    if (controller.right.isPressed()) {
+        playerPlane.rotationDegrees += 3
+    }
+    if (controller.left.isPressed()) {
+        playerPlane.rotationDegrees += -3
     }
 })

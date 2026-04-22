@@ -251,7 +251,8 @@ ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
 `;
             case "image3":
             case "Bullet":return img`
-5 
+5 5 
+5 5 
 `;
         }
         return null;
