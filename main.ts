@@ -237,7 +237,7 @@ function alienSpawn (mySprite: Sprite) {
 }
 sprites.onOverlap(SpriteKind.Player, SpriteKind.Enemy, function (sprite, otherSprite) {
     sprites.destroy(otherSprite, effects.fire, 500)
-    minusTimesList.push(5)
+    minusTimesList.push(5 + minusTimesList[0])
     info.changeCountdownBy(-1 * minusTimesList.removeAt(0))
     crashes += 1
     music.play(music.createSoundEffect(WaveShape.Noise, 902, 663, 255, 255, 2000, SoundExpressionEffect.Vibrato, InterpolationCurve.Linear), music.PlaybackMode.UntilDone)
