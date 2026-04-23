@@ -2,12 +2,22 @@ namespace SpriteKind {
     export const Other = SpriteKind.create()
 }
 controller.up.onEvent(ControllerButtonEvent.Pressed, function () {
-    music.play(music.createSoundEffect(WaveShape.Triangle, 5000, 4194, 255, 255, 100, SoundExpressionEffect.Vibrato, InterpolationCurve.Linear), music.PlaybackMode.UntilDone)
-    // your sprite's current rotation
-    angleRad = playerPlane.rotation
-    vx = Math.cos(angleRad) * 100
-    vy = Math.sin(angleRad) * 100
-    projectile = sprites.createProjectileFromSprite(assets.image`Bullet`, playerPlane, vx, vy)
+    if (Active) {
+        music.play(music.createSoundEffect(WaveShape.Triangle, 5000, 4194, 255, 255, 100, SoundExpressionEffect.Vibrato, InterpolationCurve.Linear), music.PlaybackMode.UntilDone)
+        // your sprite's current rotation
+        angleRad = playerPlane.rotation
+        vx = Math.cos(angleRad) * 100
+        vy = Math.sin(angleRad) * 100
+        projectile = sprites.createProjectileFromSprite(assets.image`Bullet`, playerPlane, vx, vy)
+    }
+})
+controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
+    if (!(Active)) {
+        animation.stopAnimation(animation.AnimationTypes.All, titleScreenPlane)
+        sprites.destroyAllSpritesOfKind(SpriteKind.Other)
+        game1()
+        Active = true
+    }
 })
 sprites.onOverlap(SpriteKind.Enemy, SpriteKind.Projectile, function (sprite, otherSprite) {
     sprites.destroy(sprite, effects.fire, 500)
@@ -18,6 +28,7 @@ sprites.onOverlap(SpriteKind.Enemy, SpriteKind.Projectile, function (sprite, oth
     music.play(music.createSoundEffect(WaveShape.Noise, 902, 663, 255, 255, 300, SoundExpressionEffect.Vibrato, InterpolationCurve.Linear), music.PlaybackMode.UntilDone)
 })
 function game1 () {
+    Timealiveref = game.runtime()
     destroyedAliens = 0
     crashes = 0
     scene.setBackgroundImage(assets.image`game1Scene`)
@@ -58,11 +69,18 @@ function game1 () {
     ]
 }
 info.onCountdownEnd(function () {
+    Active = false
     sprites.destroyAllSpritesOfKind(SpriteKind.Enemy)
     sprites.destroyAllSpritesOfKind(SpriteKind.Projectile)
     sprites.destroyAllSpritesOfKind(SpriteKind.Player)
+    Endscreen(destroyedAliens, crashes, game.runtime())
 })
+function Endscreen (Numberdes: number, Numbercol: number, Timealive: number) {
+    scene.setBackgroundImage(assets.image`end`)
+    game.showLongText("Aliens Destroyed: " + Numberdes + " Aliens Crashed: " + Numbercol + " Time Alive: " + (Timealive - Timealiveref) / 1000, DialogLayout.Bottom)
+}
 function titleScreen () {
+    Active = false
     scene.setBackgroundImage(assets.image`TitleScreen`)
     titleScreenPlane = sprites.create(img`
         ....ffffff.........ccc..
@@ -197,26 +215,6 @@ function titleScreen () {
 function alienSpawn (mySprite: Sprite) {
     if (randint(0, 1) == 1) {
         xAlienSpawn = randint(0, 160)
-        if (xAlienSpawn >= 80) {
-            mySprite.setImage(img`
-                ........fffff...........
-                .......ffff8cf..........
-                ...ffffffff8ccf.........
-                ...c8888cfffc8f.........
-                ...c888844ffffffffff....
-                ....f888844fc8888888ff..
-                .....f8888448888888888f.
-                fffffcc888c888888888888f
-                f88ccccccc888899111b888c
-                .c88c888888888b11199b8c.
-                ..cf8888888888888b999c..
-                ..f884cc8888888844b9c...
-                ..f844cccc88884448cc....
-                ..f44cc...fffccccff.....
-                ..f4cc.......fcc88ff....
-                ..ccc.........ffffff....
-                `)
-        }
         if (randint(0, 1) == 1) {
             yAlienSpawn = 120
         } else {
@@ -226,31 +224,12 @@ function alienSpawn (mySprite: Sprite) {
         yAlienSpawn = randint(0, 120)
         if (randint(0, 1) == 1) {
             xAlienSpawn = 160
-            mySprite.setImage(img`
-                ........fffff...........
-                .......ffff8cf..........
-                ...ffffffff8ccf.........
-                ...c8888cfffc8f.........
-                ...c888844ffffffffff....
-                ....f888844fc8888888ff..
-                .....f8888448888888888f.
-                fffffcc888c888888888888f
-                f88ccccccc888899111b888c
-                .c88c888888888b11199b8c.
-                ..cf8888888888888b999c..
-                ..f884cc8888888844b9c...
-                ..f844cccc88884448cc....
-                ..f44cc...fffccccff.....
-                ..f4cc.......fcc88ff....
-                ..ccc.........ffffff....
-                `)
         } else {
             xAlienSpawn = 0
         }
     }
     mySprite.setPosition(xAlienSpawn, yAlienSpawn)
-    mySprite.setScale(randint(8, 10) / 10, ScaleAnchor.Middle)
-    mySprite.follow(playerPlane, 40 - mySprite.scale * 30)
+    mySprite.follow(playerPlane, 20)
     mySprite.rotation = Math.atan2(playerPlane.y - yAlienSpawn, playerPlane.x - xAlienSpawn)
 }
 sprites.onOverlap(SpriteKind.Player, SpriteKind.Enemy, function (sprite, otherSprite) {
@@ -262,43 +241,48 @@ sprites.onOverlap(SpriteKind.Player, SpriteKind.Enemy, function (sprite, otherSp
 })
 let yAlienSpawn = 0
 let xAlienSpawn = 0
-let titleScreenPlane: Sprite = null
 let minusTimesList: number[] = []
 let crashes = 0
+let Timealiveref = 0
 let destroyedAliens = 0
 let additionTimesList: number[] = []
+let titleScreenPlane: Sprite = null
 let projectile: Sprite = null
 let vy = 0
 let vx = 0
 let playerPlane: Sprite = null
 let angleRad = 0
-game1()
-let Active = true
+let Active = false
+titleScreen()
 game.onUpdateInterval(1000, function () {
-    alienSpawn(sprites.create(img`
-        ..ccc.........ffffff....
-        ..f4cc.......fcc88ff....
-        ..f44cc...fffccccff.....
-        ..f844cccc88884448cc....
-        ..f884cc8888888844b9c...
-        ..cf8888888888888b999c..
-        .c88c888888888b11199b8c.
-        f88ccccccc888899111b888c
-        fffffcc888c888888888888f
-        .....f8888448888888888f.
-        ....f888844fc8888888ff..
-        ...c888844ffffffffff....
-        ...c8888cfffc8f.........
-        ...ffffffff8ccf.........
-        .......ffff8cf..........
-        ........fffff...........
-        `, SpriteKind.Enemy))
+    if (Active) {
+        alienSpawn(sprites.create(img`
+            ..ccc.........ffffff....
+            ..f4cc.......fcc88ff....
+            ..f44cc...fffccccff.....
+            ..f844cccc88884448cc....
+            ..f884cc8888888844b9c...
+            ..cf8888888888888b999c..
+            .c88c888888888b11199b8c.
+            f88ccccccc888899111b888c
+            fffffcc888c888888888888f
+            .....f8888448888888888f.
+            ....f888844fc8888888ff..
+            ...c888844ffffffffff....
+            ...c8888cfffc8f.........
+            ...ffffffff8ccf.........
+            .......ffff8cf..........
+            ........fffff...........
+            `, SpriteKind.Enemy))
+    }
 })
 game.onUpdateInterval(10, function () {
-    if (controller.right.isPressed()) {
-        playerPlane.rotationDegrees += 3
-    }
-    if (controller.left.isPressed()) {
-        playerPlane.rotationDegrees += -3
+    if (Active) {
+        if (controller.right.isPressed()) {
+            playerPlane.rotationDegrees += 3
+        }
+        if (controller.left.isPressed()) {
+            playerPlane.rotationDegrees += -3
+        }
     }
 })
