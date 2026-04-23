@@ -22,8 +22,8 @@ controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
 sprites.onOverlap(SpriteKind.Enemy, SpriteKind.Projectile, function (sprite, otherSprite) {
     sprites.destroy(sprite, effects.fire, 500)
     sprites.destroy(otherSprite, effects.fire, 500)
-    info.changeCountdownBy(additionTimesList.removeAt(0))
     additionTimesList.push(1)
+    info.changeCountdownBy(additionTimesList.removeAt(0))
     destroyedAliens += 1
     music.play(music.createSoundEffect(WaveShape.Noise, 902, 663, 255, 255, 300, SoundExpressionEffect.Vibrato, InterpolationCurve.Linear), music.PlaybackMode.UntilDone)
 })
@@ -53,19 +53,17 @@ function game1 () {
     playerPlane.setScale(1, ScaleAnchor.Middle)
     info.startCountdown(30)
     minusTimesList = [
-    0.2,
-    0.5,
     1,
     2,
+    3,
     4,
     5
     ]
     additionTimesList = [
-    0.1,
-    0.2,
-    0.5,
-    0.8,
-    1
+    5,
+    4,
+    3,
+    2
     ]
 }
 info.onCountdownEnd(function () {
@@ -76,8 +74,13 @@ info.onCountdownEnd(function () {
     Endscreen(destroyedAliens, crashes, game.runtime())
 })
 function Endscreen (Numberdes: number, Numbercol: number, Timealive: number) {
-    scene.setBackgroundImage(assets.image`end`)
     game.showLongText("Aliens Destroyed: " + Numberdes + " Aliens Crashed: " + Numbercol + " Time Alive: " + (Timealive - Timealiveref) / 1000, DialogLayout.Bottom)
+    if (Numberdes / Numbercol > 4 && Timealive > 35) {
+        scene.setBackgroundImage(assets.image`end`)
+        game.gameOver(true)
+    } else {
+        scene.setBackgroundImage(assets.image`end`)
+    }
 }
 function titleScreen () {
     Active = false
@@ -234,8 +237,8 @@ function alienSpawn (mySprite: Sprite) {
 }
 sprites.onOverlap(SpriteKind.Player, SpriteKind.Enemy, function (sprite, otherSprite) {
     sprites.destroy(otherSprite, effects.fire, 500)
-    info.changeCountdownBy(-1 * minusTimesList.removeAt(0))
     minusTimesList.push(5)
+    info.changeCountdownBy(-1 * minusTimesList.removeAt(0))
     crashes += 1
     music.play(music.createSoundEffect(WaveShape.Noise, 902, 663, 255, 255, 2000, SoundExpressionEffect.Vibrato, InterpolationCurve.Linear), music.PlaybackMode.UntilDone)
 })
@@ -256,25 +259,47 @@ let Active = false
 titleScreen()
 game.onUpdateInterval(1000, function () {
     if (Active) {
-        // Alien has a parameter to spawn this certain one
-        alienSpawn(sprites.create(img`
-            ..ccc.........ffffff....
-            ..f4cc.......fcc88ff....
-            ..f44cc...fffccccff.....
-            ..f844cccc88884448cc....
-            ..f884cc8888888844b9c...
-            ..cf8888888888888b999c..
-            .c88c888888888b11199b8c.
-            f88ccccccc888899111b888c
-            fffffcc888c888888888888f
-            .....f8888448888888888f.
-            ....f888844fc8888888ff..
-            ...c888844ffffffffff....
-            ...c8888cfffc8f.........
-            ...ffffffff8ccf.........
-            .......ffff8cf..........
-            ........fffff...........
-            `, SpriteKind.Enemy))
+        if (randint(1, 2) == 1) {
+            // Alien has a parameter to spawn this certain one
+            alienSpawn(sprites.create(img`
+                ..ccc.........ffffff....
+                ..f4cc.......fcc88ff....
+                ..f44cc...fffccccff.....
+                ..f844cccc88884448cc....
+                ..f884cc8888888844b9c...
+                ..cf8888888888888b999c..
+                .c88c888888888b11199b8c.
+                f88ccccccc888899111b888c
+                fffffcc888c888888888888f
+                .....f8888448888888888f.
+                ....f888844fc8888888ff..
+                ...c888844ffffffffff....
+                ...c8888cfffc8f.........
+                ...ffffffff8ccf.........
+                .......ffff8cf..........
+                ........fffff...........
+                `, SpriteKind.Enemy))
+        } else {
+            // Alien has a parameter to spawn this certain one
+            alienSpawn(sprites.create(img`
+                ..ccc.........ffffff....
+                ..f4cc.......fccccff....
+                ..f44cc...fffccccff.....
+                ..fc44cccccccc444ccc....
+                ..fcc4cccccccccc44b9c...
+                ..cfcccccccccccccb999c..
+                .cccccccccccccb11199bcc.
+                fccccccccccccc99111bcccc
+                fffffccccccccccccccccccf
+                .....fcccc44ccccccccccf.
+                ....fcccc44fccccccccff..
+                ...ccccc44ffffffffff....
+                ...ccccccfffccf.........
+                ...ffffffffcccf.........
+                .......ffffccf..........
+                ........fffff...........
+                `, SpriteKind.Enemy))
+        }
     }
 })
 game.onUpdateInterval(10, function () {
