@@ -22,7 +22,7 @@ controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
 sprites.onOverlap(SpriteKind.Enemy, SpriteKind.Projectile, function (sprite, otherSprite) {
     sprites.destroy(sprite, effects.fire, 500)
     sprites.destroy(otherSprite, effects.fire, 500)
-    additionTimesList.push(1)
+    additionTimesList.push(1 + minusTimesList[0])
     info.changeCountdownBy(additionTimesList.removeAt(0))
     destroyedAliens += 1
     music.play(music.createSoundEffect(WaveShape.Noise, 902, 663, 255, 255, 300, SoundExpressionEffect.Vibrato, InterpolationCurve.Linear), music.PlaybackMode.UntilDone)
@@ -60,9 +60,9 @@ function game1 () {
     5
     ]
     additionTimesList = [
-    5,
-    4,
-    3,
+    0.5,
+    1,
+    1.5,
     2
     ]
 }
@@ -244,10 +244,10 @@ sprites.onOverlap(SpriteKind.Player, SpriteKind.Enemy, function (sprite, otherSp
 })
 let yAlienSpawn = 0
 let xAlienSpawn = 0
-let minusTimesList: number[] = []
 let crashes = 0
 let Timealiveref = 0
 let destroyedAliens = 0
+let minusTimesList: number[] = []
 let additionTimesList: number[] = []
 let titleScreenPlane: Sprite = null
 let projectile: Sprite = null
