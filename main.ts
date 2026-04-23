@@ -256,6 +256,7 @@ let Active = false
 titleScreen()
 game.onUpdateInterval(1000, function () {
     if (Active) {
+        // Alien has a parameter to spawn this certain one
         alienSpawn(sprites.create(img`
             ..ccc.........ffffff....
             ..f4cc.......fcc88ff....
